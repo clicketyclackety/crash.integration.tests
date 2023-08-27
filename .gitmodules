@@ -1,0 +1,8 @@
+[submodule "crash"]
+	path = crash
+	url = https://github.com/crashcloud/crash
+	branch = clicky/immutable-db
+[submodule "crash.server"]
+	path = crash.server
+	url = https://github.com/crashcloud/crash.server
+	branch = clicky/immutable-db
