@@ -1,51 +1,62 @@
-using Crash.Client;
+﻿using Crash.Client;
 using Crash.Common.Document;
 using Crash.Server;
 using Crash.Server.Hubs;
 using Crash.Server.Model;
+
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using User = Crash.Common.Document.User;
 
 namespace integration.tests
 {
 
-    public class Tests
-    {
+    public class Tests : IDisposable
+	{
+		const string url = "http://0.0.0.0:8080";
+		const string uurl = "http://localhost:8080/Crash";
 
-        [SetUp]
+		private CrashDoc Doc;
+		private WebApplication App;
+
+		public void Dispose()
+		{
+			
+		}
+
+		[SetUp]
         public void Setup()
         {
+            Doc = new CrashDoc();
+			Doc.Users.CurrentUser = new User("Me");
+			Doc.LocalClient = new CrashClient(Doc, "me", new Uri(uurl));
 
-            CrashDoc crashDoc = new CrashDoc();
+			App = Program.CreateApplication(new string[] { $"--urls {url}" });
+			App.RunAsync();
+		}
 
-            ;
-        }
+		[TearDown]
+		public async Task TearDown()
+		{
+			await Doc.LocalClient.StopAsync();
+			await App.StopAsync();
+		}
 
         [Test]
         public async Task Test1()
         {
-            var url = "http://0.0.0.0:8080";
-            var uurl = "http://localhost:8080/Crash";
 
-            var app = Program.CreateApplication(new string[] { $"--urls {url}" });
-            var application = app.Application;
-            var context = app.Context;
-
-            var crashDoc = new CrashDoc();
-            crashDoc.Users.CurrentUser = new User("Me");
-            crashDoc.LocalClient = new CrashClient(crashDoc, "me", new Uri(uurl));
-
-            crashDoc.LocalClient.OnInitialize += (changes) =>
+			Doc.LocalClient.OnInitialize += (changes) =>
             {
                 Assert.That(changes, Is.Empty);
             };
 
-            crashDoc.LocalClient.OnInitializeUsers += (changes) =>
+			Doc.LocalClient.OnInitializeUsers += (changes) =>
             {
                 Assert.That(changes, Is.Empty);
             };
 
-            await crashDoc.LocalClient.StartLocalClientAsync();
+            await Doc.LocalClient.StartLocalClientAsync();
 
             ;
         }
