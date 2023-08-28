@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "integration.tests", "integration.tests\integration.tests.csproj", "{2D007BA2-72D3-4F97-9519-72425D7DF6C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "integration.tests", "src\integration.tests.csproj", "{2D007BA2-72D3-4F97-9519-72425D7DF6C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server", "..\crash.server\src\Crash.Server.csproj", "{1DED8EE5-E980-48A1-B9A9-A494D907D056}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server", "crash.server\src\Crash.Server.csproj", "{1DED8EE5-E980-48A1-B9A9-A494D907D056}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Common", "..\crash\src\Crash.Common\Crash.Common.csproj", "{2E6C854A-90F1-4BEB-B96F-3D55B72B4E6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Common", "crash\src\Crash.Common\Crash.Common.csproj", "{2E6C854A-90F1-4BEB-B96F-3D55B72B4E6E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Handlers", "..\crash\src\Crash.Handlers\Crash.Handlers.csproj", "{AA2BC9E5-1300-4B1C-A863-53B01FD7D425}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Handlers", "crash\src\Crash.Handlers\Crash.Handlers.csproj", "{AA2BC9E5-1300-4B1C-A863-53B01FD7D425}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "submodules", "submodules", "{F5180D1F-C982-4524-BF3D-6FF0C356CFC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1DED8EE5-E980-48A1-B9A9-A494D907D056} = {F5180D1F-C982-4524-BF3D-6FF0C356CFC5}
+		{2E6C854A-90F1-4BEB-B96F-3D55B72B4E6E} = {F5180D1F-C982-4524-BF3D-6FF0C356CFC5}
+		{AA2BC9E5-1300-4B1C-A863-53B01FD7D425} = {F5180D1F-C982-4524-BF3D-6FF0C356CFC5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCF135AE-4FA8-4E7C-8901-EB60635A167B}

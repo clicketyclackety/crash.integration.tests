@@ -17,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\crash.server\src\Crash.Server.csproj" />
-    <ProjectReference Include="..\..\crash\src\Crash.Common\Crash.Common.csproj" />
-    <ProjectReference Include="..\..\crash\src\Crash.Handlers\Crash.Handlers.csproj" />
+    <ProjectReference Include="..\crash.server\src\Crash.Server.csproj" />
+    <ProjectReference Include="..\crash\src\Crash.Common\Crash.Common.csproj" />
+    <ProjectReference Include="..\crash\src\Crash.Handlers\Crash.Handlers.csproj" />
   </ItemGroup>
 
 </Project>
