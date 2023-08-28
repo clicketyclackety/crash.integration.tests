@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -17,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\crash.server\src\Crash.Server.csproj" />
-    <ProjectReference Include="..\crash\src\Crash.Common\Crash.Common.csproj" />
-    <ProjectReference Include="..\crash\src\Crash.Handlers\Crash.Handlers.csproj" />
+    <ProjectReference Include="..\submodules\crash.server\src\Crash.Server.csproj" />
+    <ProjectReference Include="..\submodules\crash\src\Crash.Common\Crash.Common.csproj" />
+    <ProjectReference Include="..\submodules\crash\src\Crash.Handlers\Crash.Handlers.csproj" />
   </ItemGroup>
 
 </Project>

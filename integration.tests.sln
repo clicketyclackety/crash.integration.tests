@@ -5,11 +5,11 @@ VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "integration.tests", "src\integration.tests.csproj", "{2D007BA2-72D3-4F97-9519-72425D7DF6C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server", "crash.server\src\Crash.Server.csproj", "{1DED8EE5-E980-48A1-B9A9-A494D907D056}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Server", "submodules\crash.server\src\Crash.Server.csproj", "{1DED8EE5-E980-48A1-B9A9-A494D907D056}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Common", "crash\src\Crash.Common\Crash.Common.csproj", "{2E6C854A-90F1-4BEB-B96F-3D55B72B4E6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Common", "submodules\crash\src\Crash.Common\Crash.Common.csproj", "{2E6C854A-90F1-4BEB-B96F-3D55B72B4E6E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Handlers", "crash\src\Crash.Handlers\Crash.Handlers.csproj", "{AA2BC9E5-1300-4B1C-A863-53B01FD7D425}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crash.Handlers", "submodules\crash\src\Crash.Handlers\Crash.Handlers.csproj", "{AA2BC9E5-1300-4B1C-A863-53B01FD7D425}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "submodules", "submodules", "{F5180D1F-C982-4524-BF3D-6FF0C356CFC5}"
 EndProject

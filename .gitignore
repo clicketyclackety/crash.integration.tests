@@ -19,10 +19,6 @@ mono_crash.*
 # OSX Specific Files
 *.DS_Store
 
-# Submodules
-crash.server/
-crash/
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
