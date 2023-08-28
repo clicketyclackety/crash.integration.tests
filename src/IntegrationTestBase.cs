@@ -20,6 +20,8 @@ namespace integration.tests
 
 		protected WebApplication App;
 
+		protected int Clients = 0;
+
 		protected void SetupCrashDocs(int count)
 		{
 			for(int i = 0; i < count; i++)
@@ -31,9 +33,36 @@ namespace integration.tests
 
 				Connected[i] = false;
 			}
-			
+
 		}
 
+		[SetUp]
+		public async Task Setup()
+		{
+			SetupCrashDocs(Clients);
+			SetupClients();
+			SetupServer();
+		}
+
+		[TearDown]
+		public async Task TearDown()
+		{
+			foreach (var kvp in LocalDocuments)
+			{
+				await kvp.Value.LocalClient.StopAsync();
+			}
+
+			await App.StopAsync();
+
+			Assert.That(Initialized, Is.True, "Server never Initialized");
+			// Assert.That(UsersInitialized, Is.True, "Server never Initialized Users");
+
+			Initialized = false;
+			UsersInitialized = false;
+		}
+
+		private bool Initialized;
+		private bool UsersInitialized;
 		protected void SetupClients()
 		{
 			foreach(var kvp in LocalDocuments)
@@ -45,11 +74,13 @@ namespace integration.tests
 				doc.LocalClient.OnInitialize += (changes) =>
 				{
 					Assert.That(changes, Is.Empty);
+					Initialized = true;
 				};
 
 				doc.LocalClient.OnInitializeUsers += (changes) =>
 				{
 					Assert.That(changes, Is.Empty);
+					UsersInitialized = true;
 				};
 			}
 		}
