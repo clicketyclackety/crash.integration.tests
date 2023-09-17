@@ -32,12 +32,23 @@ namespace integration.tests
 			for (var i = 0; i < count; i++)
 			{
 				var doc = new CrashDoc();
-				doc.Users.CurrentUser = new User(Users[i]);
+
+				doc.Users.CurrentUser = new User(GetUser(i));
 
 				LocalDocuments[i] = doc;
 
 				Connected[i] = false;
 			}
+		}
+
+		private string GetUser(int index)
+		{
+			if (index < Users.Count)
+			{
+				return Users[index];
+			}
+
+			return Path.GetRandomFileName().Replace(".", "");
 		}
 
 		[SetUp]
@@ -69,7 +80,7 @@ namespace integration.tests
 		{
 			foreach (var (index, doc) in LocalDocuments)
 			{
-				doc.LocalClient = new CrashClient(doc, Users[index], new Uri(uurl));
+				doc.LocalClient = new CrashClient(doc, GetUser(index), new Uri(uurl));
 
 				doc.LocalClient.OnInitializeChanges += changes =>
 				{

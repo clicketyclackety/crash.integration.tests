@@ -92,7 +92,7 @@ namespace integration.tests
 				));
 
 			// Check for recieve of Add
-			AssertWithPolling(() => secondClientRecieved);
+			Utils.AssertWithPolling(() => secondClientRecieved);
 		}
 
 		/// <summary>Tests that a base Change is modified correctly</summary>
@@ -130,11 +130,6 @@ namespace integration.tests
 			//	- 3 are released on #1
 			//	- 3 are not temp, 2 are temp on #2
 			//	- Server has them stored correctly
-		}
-
-		private static void AssertWithPolling(Func<bool> valueCheck)
-		{
-			Assert.That(() => valueCheck(), Is.True.After(5).Seconds.PollEvery(250).MilliSeconds);
 		}
 	}
 }
