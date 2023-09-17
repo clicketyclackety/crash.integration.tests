@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-using Crash.Changes;
+﻿using Crash.Changes;
 using Crash.Changes.Utils;
 using Crash.Common.Changes;
 using Crash.Common.View;
@@ -70,28 +68,13 @@ namespace integration.tests
 			var changeId = Guid.NewGuid();
 
 			// Add a piece of Geometry
-			await LocalDocuments[0].LocalClient.PushChangeAsync(
-				GeometryChange.CreateChange(changeId, Users[0],
-					ChangeAction.Add | ChangeAction.Temporary,
-					"Test!"
-				));
+			await PushNewChangeToServer(0, changeId, Users[0]);
 
 			// Transform Change
-			var transformPayload = JsonSerializer.Serialize(new CTransform(Enumerable.Repeat(100.0, 16).ToArray()));
-			await LocalDocuments[0].LocalClient.PushChangeAsync(
-				GeometryChange.CreateChange(changeId, Users[0],
-					ChangeAction.Transform,
-					transformPayload
-				));
+			await TransformExistingChangeOnServer(0, changeId, Users[0]);
 
 			// Add some Update Values to Change
-			var updateData = new Dictionary<string, string> { { "Key", "Value" } };
-			var updatePayload = JsonSerializer.Serialize(updateData);
-			await LocalDocuments[0].LocalClient.PushChangeAsync(
-				GeometryChange.CreateChange(changeId, Users[0],
-					ChangeAction.Update,
-					updatePayload
-				));
+			await AppendUpdateToExistingChangeOnServer(0, changeId, Users[0]);
 
 			Change triageChange = null;
 
@@ -160,11 +143,24 @@ namespace integration.tests
 		[Test]
 		public async Task TestApplied() // Update & transform & Lock & Unlock
 		{
-			// Connect 2 clients
+			// Connect 2 Clients
+			await LocalDocuments[0].LocalClient.StartLocalClientAsync();
+			await LocalDocuments[1].LocalClient.StartLocalClientAsync();
+
+			var changeId = Guid.NewGuid();
+
 			// Add with 1st
+			await PushNewChangeToServer(0, changeId, Users[0]);
+
 			// Release
+			await ReleaseChangesByUser(0, Users[0]);
+
 			// Transform
+			await TransformExistingChangeOnServer(0, changeId, Users[0]);
+
 			// Release
+			await ReleaseChangesByUser(0, Users[0]);
+
 			// Update
 			// Lock
 			// Unlock
@@ -174,10 +170,47 @@ namespace integration.tests
 		[Test]
 		public async Task TestRelease()
 		{
+			var clientCount = 3;
+
 			// Connect 3 clients
+			for (var i = 0; i < clientCount; i++)
+			{
+				await LocalDocuments[i].LocalClient.StartLocalClientAsync();
+			}
+
 			// Add items on each client (x3)
+			for (var i = 0; i < clientCount; i++)
+			{
+				await PushNewChangeToServer(i, Guid.NewGuid(), Users[i]);
+			}
+
+			var firstClientRecievedRelease = false;
+			var secondClientRecievedRelease = false;
+			var thirdClientRecievedRelease = false;
+
+			LocalDocuments[0].LocalClient.OnPushChange += changes =>
+			{
+				firstClientRecievedRelease = true;
+			};
+			LocalDocuments[1].LocalClient.OnPushChange += changes =>
+			{
+				secondClientRecievedRelease = true;
+			};
+			LocalDocuments[2].LocalClient.OnPushChange += changes =>
+			{
+				thirdClientRecievedRelease = true;
+			};
+
 			// release all from 1st, then 2nd, then 3rd in a cycle
+			for (var i = 0; i < clientCount; i++)
+			{
+				await ReleaseChangesByUser(i, Users[i]);
+			}
+
 			// assert releases all work correctly
+			Assert.That(() => firstClientRecievedRelease, Is.True.After(3).Seconds.PollEvery(250));
+			Assert.That(() => secondClientRecievedRelease, Is.True.After(3).Seconds.PollEvery(250));
+			Assert.That(() => thirdClientRecievedRelease, Is.True.After(3).Seconds.PollEvery(250));
 		}
 
 		/// <summary>Tests that release selected works as advertised</summary>
@@ -185,8 +218,18 @@ namespace integration.tests
 		public async Task TestReleaseSelected()
 		{
 			// Connect 2 clients
+			await LocalDocuments[0].LocalClient.StartLocalClientAsync();
+			await LocalDocuments[1].LocalClient.StartLocalClientAsync();
+
 			// Add (5 items) with 1st
+			for (var i = 0; i < 5; i++)
+			{
+				await PushNewChangeToServer(0, Guid.NewGuid(), Users[0]);
+			}
+
 			// release 3 from 1st
+			Assert.True(false, "test not written yet");
+
 			// assert
 			//	- 3 are released on #1
 			//	- 3 are not temp, 2 are temp on #2

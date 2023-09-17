@@ -42,8 +42,7 @@ namespace integration.tests
 			await LocalDocuments[0].LocalClient.StartLocalClientAsync();
 
 			// Do we need to Add?
-
-			await LocalDocuments[0].LocalClient.DoneAsync(); // Users[0]);
+			ReleaseChangesByUser(0, Users[0]);
 		}
 
 		[Test]

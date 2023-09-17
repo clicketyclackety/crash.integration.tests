@@ -1,5 +1,10 @@
-﻿using Crash.Common.Communications;
+﻿using System.Text.Json;
+
+using Crash.Changes;
+using Crash.Common.Communications;
 using Crash.Common.Document;
+using Crash.Geometry;
+using Crash.Handlers.Changes;
 using Crash.Server;
 
 using Microsoft.AspNetCore.Builder;
@@ -101,5 +106,47 @@ namespace integration.tests
 			App = Program.CreateApplication($"--urls {url}");
 			App.RunAsync();
 		}
+
+		#region Utils
+
+		protected async Task PushNewChangeToServer(int index, Guid changeId, string user)
+		{
+			await LocalDocuments[index].LocalClient.PushChangeAsync(
+				GeometryChange.CreateChange(changeId, user,
+					ChangeAction.Add | ChangeAction.Temporary,
+					"Test!"
+				));
+		}
+
+		protected async Task TransformExistingChangeOnServer(int index, Guid changeId, string user)
+		{
+			var transformPayload = JsonSerializer.Serialize(new CTransform(Enumerable.Repeat(100.0, 16).ToArray()));
+			await LocalDocuments[index].LocalClient.PushChangeAsync(
+				GeometryChange.CreateChange(changeId, user,
+					ChangeAction.Transform,
+					transformPayload
+				));
+		}
+
+		protected async Task AppendUpdateToExistingChangeOnServer(int index, Guid changeId, string user)
+		{
+			var updateData = new Dictionary<string, string> { { "Key", "Value" } };
+			var updatePayload = JsonSerializer.Serialize(updateData);
+			await LocalDocuments[index].LocalClient.PushChangeAsync(
+				GeometryChange.CreateChange(changeId, user,
+					ChangeAction.Update,
+					updatePayload
+				));
+		}
+
+		protected async Task ReleaseChangesByUser(int index, string user)
+		{
+			await LocalDocuments[index].LocalClient.PushChangeAsync(
+				GeometryChange.CreateChange(Guid.NewGuid(), user,
+					ChangeAction.Release
+				));
+		}
+
+		#endregion
 	}
 }
