@@ -6,8 +6,12 @@ using Crash.Common.Document;
 using Crash.Geometry;
 using Crash.Handlers.Changes;
 using Crash.Server;
+using Crash.Server.Model;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+
+using User = Crash.Common.Document.User;
 
 namespace integration.tests
 {
@@ -145,6 +149,17 @@ namespace integration.tests
 				GeometryChange.CreateChange(Guid.NewGuid(), user,
 					ChangeAction.Release
 				));
+		}
+
+		#endregion
+		
+		#region Crash Server
+
+		protected CrashContext GetContext()
+		{
+			var scope = App.Services.CreateScope();
+			var con = scope.ServiceProvider.GetService<CrashContext>();
+			return con;
 		}
 
 		#endregion

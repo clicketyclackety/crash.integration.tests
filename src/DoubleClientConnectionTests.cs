@@ -221,19 +221,55 @@ namespace integration.tests
 			await LocalDocuments[0].LocalClient.StartLocalClientAsync();
 			await LocalDocuments[1].LocalClient.StartLocalClientAsync();
 
+			var changeIds = Enumerable.Range(0, 5).Select(i => Guid.NewGuid()).ToArray();
+
 			// Add (5 items) with 1st
-			for (var i = 0; i < 5; i++)
+			for (var i = 0; i < changeIds.Length; i++)
 			{
-				await PushNewChangeToServer(0, Guid.NewGuid(), Users[0]);
+				await PushNewChangeToServer(0, changeIds[i], Users[0]);
 			}
 
 			// release 3 from 1st
-			Assert.True(false, "test not written yet");
+			var doneChange = new Change
+			{
+				Id = Guid.NewGuid(),
+				Action = ChangeAction.Release,
+				Owner = Users[0],
+				Type = "Crash.DoneChange" // TODO : This is lazy
+			};
+			await LocalDocuments[0].LocalClient.PushIdenticalChangesAsync(changeIds[..3], doneChange);
+
 
 			// assert
 			//	- 3 are released on #1
+			// TODO : Do
+
 			//	- 3 are not temp, 2 are temp on #2
+			Assert.That(() =>
+			{
+				for (var i = 0; i < 3; i++)
+				{
+					var id = changeIds[i];
+					if (LocalDocuments[1].CacheTable.TryGetValue(id, out IChange change))
+					{
+						return false;
+					}
+				}
+
+				for (var i = 3; i < changeIds.Length; i++)
+				{
+					var id = changeIds[i];
+					if (!LocalDocuments[1].CacheTable.TryGetValue(id, out IChange change))
+					{
+						return false;
+					}
+				}
+
+				return true;
+			}, Is.True.After(3).Seconds.PollEvery(250));
+
 			//	- Server has them stored correctly
+			// TODO : Do.
 		}
 	}
 }
