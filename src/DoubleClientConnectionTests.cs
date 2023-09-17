@@ -1,8 +1,14 @@
-﻿using Crash.Changes;
+﻿using System.Text.Json;
+
+using Crash.Changes;
+using Crash.Changes.Utils;
 using Crash.Common.Changes;
 using Crash.Common.View;
 using Crash.Geometry;
 using Crash.Handlers.Changes;
+using Crash.Server.Model;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace integration.tests
 {
@@ -59,14 +65,69 @@ namespace integration.tests
 		public async Task ChangeLifetime()
 		{
 			// Connect 1 Client
+			await LocalDocuments[0].LocalClient.StartLocalClientAsync();
+
+			var changeId = Guid.NewGuid();
+
 			// Add a piece of Geometry
+			await LocalDocuments[0].LocalClient.PushChangeAsync(
+				GeometryChange.CreateChange(changeId, Users[0],
+					ChangeAction.Add | ChangeAction.Temporary,
+					"Test!"
+				));
+
 			// Transform Change
+			var transformPayload = JsonSerializer.Serialize(new CTransform(Enumerable.Repeat(100.0, 16).ToArray()));
+			await LocalDocuments[0].LocalClient.PushChangeAsync(
+				GeometryChange.CreateChange(changeId, Users[0],
+					ChangeAction.Transform,
+					transformPayload
+				));
+
 			// Add some Update Values to Change
+			var updateData = new Dictionary<string, string> { { "Key", "Value" } };
+			var updatePayload = JsonSerializer.Serialize(updateData);
+			await LocalDocuments[0].LocalClient.PushChangeAsync(
+				GeometryChange.CreateChange(changeId, Users[0],
+					ChangeAction.Update,
+					updatePayload
+				));
+
+			Change triageChange = null;
 
 			// Connect a 2nd client
-			// Monitor Init
-			// Collect Change with data triage!
-			// FIXME : I don't think init is correctly implemented
+			LocalDocuments[1].LocalClient.OnInitializeChanges += changes =>
+			{
+				// Monitor Init
+				// Collect Change with data triage!
+				triageChange = changes.FirstOrDefault(c => c.Id == changeId);
+				Assert.That(changes, Is.Not.Empty);
+			};
+
+			var scope = App.Services.CreateScope();
+			var con = scope.ServiceProvider.GetService<CrashContext>();
+
+			await LocalDocuments[1].LocalClient.StartLocalClientAsync();
+
+			Assert.That(() =>
+			{
+				if (triageChange is null)
+				{
+					return false;
+				}
+
+				Assert.That(triageChange.Action.HasFlag(ChangeAction.Add));
+				Assert.That(triageChange.Action.HasFlag(ChangeAction.Update));
+				Assert.That(triageChange.Action.HasFlag(ChangeAction.Transform));
+
+				Assert.That(PayloadUtils.TryGetPayloadFromChange(triageChange, out var packet));
+
+				Assert.That(packet.Transform, Is.Not.EqualTo(CTransform.Unset));
+				Assert.That(packet.Data, Is.Not.Null.Or.Empty);
+				Assert.That(packet.Updates, Is.Not.Empty);
+
+				return true;
+			}, Is.True.After(2).Seconds.PollEvery(250));
 		}
 
 		/// <summary>Testing that a single Change type is transmitted</summary>
