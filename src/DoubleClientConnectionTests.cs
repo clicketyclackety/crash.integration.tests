@@ -71,7 +71,7 @@ namespace integration.tests
 
 		/// <summary>Testing that a single Change type is transmitted</summary>
 		[Test]
-		public async Task TestTransmitted() // Delete // Update // Transform
+		public async Task TestChangeTransmittedToOtherClient() // Delete // Update // Transform
 		{
 			// Connect 2 Clients
 			await LocalDocuments[0].LocalClient.StartLocalClientAsync();
@@ -85,13 +85,11 @@ namespace integration.tests
 			};
 
 			// Add with 1st client
-			await LocalDocuments[0].LocalClient.PushChangeAsync(new Change
-			{
-				Type = GeometryChange.ChangeType,
-				Action = ChangeAction.Add | ChangeAction.Temporary,
-				Payload = "Test!",
-				Owner = "Client 1"
-			});
+			await LocalDocuments[0].LocalClient.PushChangeAsync(
+				GeometryChange.CreateChange(Guid.NewGuid(), Users[0],
+					ChangeAction.Add | ChangeAction.Temporary,
+					"Test!"
+				));
 
 			// Check for recieve of Add
 			AssertWithPolling(() => secondClientRecieved);
@@ -136,7 +134,7 @@ namespace integration.tests
 
 		private static void AssertWithPolling(Func<bool> valueCheck)
 		{
-			Assert.That(valueCheck, Is.True.After(10).Seconds.PollEvery(250).MilliSeconds);
+			Assert.That(() => valueCheck(), Is.True.After(5).Seconds.PollEvery(250).MilliSeconds);
 		}
 	}
 }
