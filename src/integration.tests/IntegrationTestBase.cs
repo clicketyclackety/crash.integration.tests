@@ -28,6 +28,7 @@ namespace integration.tests
 
 		protected CrashContext CurrentContext;
 
+
 		private bool Initialized;
 
 		protected Dictionary<int, CrashDoc> LocalDocuments = new();
