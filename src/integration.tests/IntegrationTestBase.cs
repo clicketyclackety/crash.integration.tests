@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 
 using Crash.Changes;
+using Crash.Common.Changes;
 using Crash.Common.Communications;
 using Crash.Common.Document;
 using Crash.Geometry;
@@ -24,6 +25,8 @@ namespace integration.tests
 
 		protected int Clients = 0;
 		protected Dictionary<int, bool> Connected = new();
+
+		protected CrashContext CurrentContext;
 
 		private bool Initialized;
 
@@ -76,6 +79,7 @@ namespace integration.tests
 				await kvp.Value.LocalClient.StopAsync();
 			}
 
+			CurrentContext = null;
 			await App.StopAsync();
 
 			Assert.That(Initialized, Is.True, "Server never Initialized");
@@ -109,7 +113,12 @@ namespace integration.tests
 		{
 			App = Program.CreateApplication($"--urls {url}");
 			App.RunAsync();
+			CurrentContext = App.Services.CreateScope().ServiceProvider.GetService<CrashContext>();
 		}
+
+		#region Crash Server
+
+		#endregion
 
 		#region Utils
 
@@ -146,20 +155,7 @@ namespace integration.tests
 		protected async Task ReleaseChangesByUser(int index, string user)
 		{
 			await LocalDocuments[index].LocalClient.PushChangeAsync(
-				GeometryChange.CreateChange(Guid.NewGuid(), user,
-					ChangeAction.Release
-				));
-		}
-
-		#endregion
-		
-		#region Crash Server
-
-		protected CrashContext GetContext()
-		{
-			var scope = App.Services.CreateScope();
-			var con = scope.ServiceProvider.GetService<CrashContext>();
-			return con;
+				DoneChange.GetDoneChange(user));
 		}
 
 		#endregion

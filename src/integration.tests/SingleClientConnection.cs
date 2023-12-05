@@ -24,6 +24,9 @@ namespace integration.tests
 				"Example Payload");
 
 			await LocalDocuments[0].LocalClient.PushChangeAsync(addChange);
+
+			Assert.That(() => CurrentContext.LatestChanges.Find(addChange.Id),
+				Is.Not.Null.After(3).Seconds.PollEvery(250));
 		}
 
 		[Test]
@@ -41,8 +44,26 @@ namespace integration.tests
 		{
 			await LocalDocuments[0].LocalClient.StartLocalClientAsync();
 
+			var addChange = GeometryChange.CreateChange(Guid.NewGuid(), Users.First().Value,
+				ChangeAction.Add | ChangeAction.Temporary,
+				"Example Payload");
+
+			await LocalDocuments[0].LocalClient.PushChangeAsync(addChange);
+
+			Assert.That(() =>
+			{
+				var change = CurrentContext.LatestChanges.Find(addChange.Id);
+				return change?.Action.HasFlag(ChangeAction.Temporary);
+			}, Is.True.After(3).Seconds.PollEvery(250));
+
 			// Do we need to Add?
 			ReleaseChangesByUser(0, Users[0]);
+
+			Assert.That(() =>
+			{
+				var change = CurrentContext.LatestChanges.Find(addChange.Id);
+				return !change?.Action.HasFlag(ChangeAction.Temporary);
+			}, Is.True.After(3).Seconds.PollEvery(250));
 		}
 
 		[Test]
